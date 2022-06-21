@@ -39,3 +39,10 @@ const (
 	ServerReady                ServerMessage = 'Z'
 	ServerRowDescription       ServerMessage = 'T'
 )
+
+type PrepareType byte
+
+const (
+	PrepareStatement PrepareType = 'S'
+	PreparePortal    PrepareType = 'P'
+)

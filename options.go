@@ -18,6 +18,13 @@ func SimpleQuery(fn SimpleQueryFn) OptionFn {
 	}
 }
 
+// Parse sets the parse handle inside the given server instance.
+func Parse(fn ParseFn) OptionFn {
+	return func(srv *Server) {
+		srv.ParseFn = fn
+	}
+}
+
 // CloseConn sets the close connection handle inside the given server instance.
 func CloseConn(fn CloseFn) OptionFn {
 	return func(srv *Server) {

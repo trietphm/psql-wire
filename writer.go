@@ -30,6 +30,8 @@ type DataWriter interface {
 	// Complete announces to the client that the command has been completed and
 	// no further data should be expected.
 	Complete(description string) error
+
+	ParseComplete() error
 }
 
 // ErrColumnsDefined is thrown when columns already have been defined inside the
@@ -116,8 +118,59 @@ func (writer *dataWriter) Complete(description string) error {
 	return commandComplete(writer.client, description)
 }
 
+func (writer *dataWriter) ParseComplete() error {
+	if writer.closed {
+		return ErrClosedWriter
+	}
+
+	defer writer.close()
+	return parseComplete(writer.client)
+}
+
+func (writer *dataWriter) BindComplete() error {
+	if writer.closed {
+		return ErrClosedWriter
+	}
+
+	defer writer.close()
+	return bindComplete(writer.client)
+}
+
+func (writer *dataWriter) SyncComplete() error {
+	if writer.closed {
+		return ErrClosedWriter
+	}
+
+	defer writer.close()
+	return bindComplete(writer.client)
+}
+
+func (writer *dataWriter) DescribeComplete() error {
+	if writer.closed {
+		return ErrClosedWriter
+	}
+
+	defer writer.close()
+	return bindComplete(writer.client)
+}
+
 func (writer *dataWriter) close() {
 	writer.closed = true
+}
+
+func bindComplete(writer *buffer.Writer) error {
+	writer.Start(types.ServerBindComplete)
+	return writer.End()
+}
+
+func describeComplete(writer *buffer.Writer) error {
+	writer.Start(types.ServerBindComplete)
+	return writer.End()
+}
+
+func parseComplete(writer *buffer.Writer) error {
+	writer.Start(types.ServerParseComplete)
+	return writer.End()
 }
 
 // commandComplete announces that the requested command has successfully been executed.
